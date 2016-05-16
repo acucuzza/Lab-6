@@ -314,6 +314,12 @@ public class PokerTableController {
 	}
 
 	@FXML
+	void btnDraw_Click(ActionEvent event) {
+		Action act = new Action(eAction.Draw, mainApp.getPlayer());
+		mainApp.messageSend(act);
+	}
+	
+	@FXML
 	public void btnFold_Click(ActionEvent event) {
 		Button btnFold = (Button) event.getSource();
 		Action act = new Action(eAction.Fold, mainApp.getPlayer());

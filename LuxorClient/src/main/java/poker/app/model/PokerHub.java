@@ -193,5 +193,29 @@ public class PokerHub extends Hub {
 		}
 
 	}
+	
+	private void DrawCards(CardDraw cd) throws DeckException {
+		for (int i = 0; i < cd.getCardCountDrawn().getCardCount(); i++) {
+
+			if (cd.getCardDestination() == eCardDestination.Player) {
+				for (int n : HubGamePlay.getiActOrder()) {
+					// If Player at the position exists... and the their hand
+					// isnt' folded, deal a card
+					if ((HubGamePlay.getPlayerByPosition(n) != null)
+							&& (HubGamePlay.getPlayerHand(HubGamePlay.getPlayerByPosition(n).getPlayerID()))
+									.isFolded() == false) {
+						HubGamePlay.getPlayerHand(HubGamePlay.getPlayerByPosition(n).getPlayerID())
+								.Draw(HubGamePlay.getGameDeck());
+					}
+				}
+
+			}
+			else if (cd.getCardDestination() == eCardDestination.Community)
+			{
+				HubGamePlay.getCommonHand().Draw(HubGamePlay.getGameDeck());
+			}
+		}
+
+	}
 
 }

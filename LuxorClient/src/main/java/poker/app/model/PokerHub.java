@@ -163,18 +163,35 @@ public class PokerHub extends Hub {
 				break;
 			case Deal:
 				resetOutput();
-				int iCardstoDraw[] = HubGamePlay.getRule().getiCardsToDraw();
-				int iDrawCount = iCardstoDraw[iDealNbr];
-				for (int i = 0; i<iDrawCount; i++)
+				int CardsToDraw = HubGamePlay.getRule().getPlayerCardsMin();
+				for (int i = iDealNbr; i < CardsToDraw; i++)
 				{
 					try {
-						Card c = HubGamePlay.getGameDeck().Draw();
+						DealCards(HubGamePlay.getRule().getCardDraw(HubGamePlay.getDrawCnt()));
 					} catch (DeckException e) {
 						e.printStackTrace();
+						sendToAll(e);
 					}
 				}
+				System.out.println("Sending Deal back to Client");
+				sendToAll(HubGamePlay);
 				break;
-			}
+			case Draw:
+				resetOutput();
+				int MaxCardsToDraw = HubGamePlay.getRule().getTotalCardsToDraw();
+				int CardsDrawn = HubGamePlay.getDrawCnt().getDrawNo();
+				if(CardsDrawn <= MaxCardsToDraw){
+					try {
+						DrawCards(HubGamePlay.getRule().getCardDraw(HubGamePlay.getDrawCnt()));
+					} catch (DeckException e) {
+						e.printStackTrace();
+						sendToAll(e);
+					}
+				}
+				System.out.println("Sending Draw back to Client");
+				sendToAll(HubGamePlay);
+				break;
+		}
 		}
 
 		// System.out.println("Message Received by Hub");
@@ -201,31 +218,24 @@ public class PokerHub extends Hub {
 				HubGamePlay.getCommonHand().Draw(HubGamePlay.getGameDeck());
 			}
 		}
-
 	}
-	
 	private void DrawCards(CardDraw cd) throws DeckException {
-		for (int i = 0; i < cd.getCardCountDrawn().getCardCount(); i++) {
-
-			if (cd.getCardDestination() == eCardDestination.Player) {
-				for (int n : HubGamePlay.getiActOrder()) {
-					// If Player at the position exists... and the their hand
-					// isnt' folded, deal a card
-					if ((HubGamePlay.getPlayerByPosition(n) != null)
-							&& (HubGamePlay.getPlayerHand(HubGamePlay.getPlayerByPosition(n).getPlayerID()))
-									.isFolded() == false) {
-						HubGamePlay.getPlayerHand(HubGamePlay.getPlayerByPosition(n).getPlayerID())
-								.Draw(HubGamePlay.getGameDeck());
-					}
+		if (cd.getCardDestination() == eCardDestination.Player) {
+			for (int n : HubGamePlay.getiActOrder()) {
+				// If Player at the position exists... and the their hand
+				// isnt' folded, deal a card
+				if ((HubGamePlay.getPlayerByPosition(n) != null)
+						&& (HubGamePlay.getPlayerHand(HubGamePlay.getPlayerByPosition(n).getPlayerID()))
+								.isFolded() == false) {
+					HubGamePlay.getPlayerHand(HubGamePlay.getPlayerByPosition(n).getPlayerID())
+							.Draw(HubGamePlay.getGameDeck());
 				}
-
-			}
-			else if (cd.getCardDestination() == eCardDestination.Community)
-			{
-				HubGamePlay.getCommonHand().Draw(HubGamePlay.getGameDeck());
 			}
 		}
-
+		else if (cd.getCardDestination() == eCardDestination.Community)
+		{
+			HubGamePlay.getCommonHand().Draw(HubGamePlay.getGameDeck());
+		}
 	}
-
 }
+

@@ -162,7 +162,17 @@ public class PokerHub extends Hub {
 				sendToAll(HubGamePlay);
 				break;
 			case Deal:
-
+				resetOutput();
+				int iCardstoDraw[] = HubGamePlay.getRule().getiCardsToDraw();
+				int iDrawCount = iCardstoDraw[iDealNbr];
+				for (int i = 0; i<iDrawCount; i++)
+				{
+					try {
+						Card c = HubGamePlay.getGameDeck().Draw();
+					} catch (DeckException e) {
+						e.printStackTrace();
+					}
+				}
 				break;
 			}
 		}
